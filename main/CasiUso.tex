@@ -1,0 +1,81 @@
+\newpage
+\section{Casi d'uso}
+\subsection{Inserimento della votazione \emph{front end}}
+\begin{itemize}
+  \item \textbf{Voto in uscita} : In uscita dalla segreteria lo studente
+  troverà un totem multimediale touch screen con cui potrà esprimere il
+  proprio livello di soddisfazione dopo aver usufruito dei servizi offerti. La
+  schermata di introduzione è composta da un messaggio inserito per spiegare
+  all'utilizzatore la finalità per la quale viene richiesto di lasciare un
+  \emph{feedback}, un video introduttivo dell'Università degli Studi di Padova
+  e la scelta dell'operazione effettuata : servizio ricevuto presso lo sportello
+  di facoltà o sportello veloce.
+  \item \textbf{Inserimento commento} : Lo studente può lasciare un proprio
+  commento selezionando l'area con la voce ``Laciaci un commento''. Comparirà
+  una finestra di dialogo che permetterà l'inserimento del testo , il nome e
+  cognome e l'indirizzo email se il cliente vuole essere contattato. Per
+  registrare il commento bisogna accettare le condizioni sulla
+  privacy.
+  \item \textbf{Registrazione del voto} : Il cliente esprime il proprio livello
+  di soddisfazione tramite l’interfaccia selezionando uno dei 3 bottoni. In caso
+  l'utente avesse selezionato nella schermata precedente la voce ``servizio
+  sportello di facoltà'' un menu a tendina comparirà per indicare lo sportello
+  difacoltà al quale si è rivolto~(Figura~\ref{fig:usecase-voting}).
+  \item \textbf{Feedback all'utente} : Terminato il processo di registrazione
+  una finestra di dialogo certifica all'utente che il processo di voto si è
+  concluso in modo corretto.
+\end{itemize}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tikzpicture}
+    \begin{umlsystem}[x=6]{Scorecard}
+      \umlusecase[name=sportello]{Operazione allo sportello}
+      \umlusecase[name=comment,y=-1.7]{Inserimento commento}
+      \umlusecase[name=voting,y=-3.3]{Espressione del voto}
+      \umlusecase[name=store,y=-5]{Registrazione del voto}
+    \end{umlsystem}
+    \umlactor{Cliente}
+    \umlactor[x=12,y=-5]{Sistema}
+    \umlassoc{Cliente}{sportello}
+    \umlassoc{Sistema}{store}
+    \umlextend{comment}{sportello}
+    \umlassoc{comment}{voting}
+    \umlinclude{store}{voting}
+  \end{tikzpicture}
+  \caption{Caso d'uso votazione}
+  \label{fig:usecase-voting}
+\end{figure}
+
+\subsection{Consultazione dei voti \emph{back end}}
+L'amministratore potrà consultare l'andamento del livello di Customer
+Satisfaction via browser web. L’interfaccia di riepilogo dei
+voti presenterà in modo graﬁco i dati raccolti
+\begin{itemize}
+  \item L'amministratore accede all'interfaccia web del sistema.
+  \item L'amministratore sceglie la/e facoltà da monitorare, l'intervallo di
+  tempo e la tipologia di grafico. Il grafico generato conterrà in ascissa
+  l'intervallo di tempo scelto e in ordinata il valore del CS. A seconda
+  del periodo da monitare l'intevallo di campionamento è espresso in ore per la
+  modalità ``giornaliera'', giorni per ``mensile'' e mesi per
+  ``annuale''~(Figura~\ref{fig::usecase-monitoring}).
+  \item La selezione del valore ``automatico'' aggiornerà il grafico ogni 5
+  secondi aggiornando i valori qual'ora venisse registrata una nuova votazione.
+\end{itemize}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tikzpicture}
+    \begin{umlsystem}[x=6]{Scorecard}
+      \umlusecase[name=monitoring]{Accesso a interfaccia web}
+      \umlusecase[name=graph,y=-2]{Generazione dei grafici}
+    \end{umlsystem}
+    \umlactor{Amministratore}
+    \umlactor[x=12,y=-2]{Sistema}
+    \umlassoc{Amministratore}{monitoring}
+    \umlassoc{Sistema}{graph}
+    \umlinclude{graph}{monitoring}
+  \end{tikzpicture}
+  \caption{Caso d'uso consultazione dei voti}
+  \label{fig::usecase-monitoring}
+\end{figure}

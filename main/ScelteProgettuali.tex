@@ -1,0 +1,32 @@
+\newpage
+\section{Scelte progettuali}
+Raccolte le richieste del committente il team di sviluppo le ha analizzate per
+decidere come implementare l'applicazione e offrire una proposta
+di risoluzione al cliente con alcuni dettagli implementativi, costi e
+tempo di sviluppo.
+\\\\
+Tenendo conto che l'applicazione dovrà essere indipendente dalla piattaforma
+usata in quanto dovrà essere ospitata su dipositivi touch screen che possono
+essere sostituiti con prodotti concorrenziali o totem multimediali,la scelta è
+stata quella di sviluppare una \emph{web application}, residente su un server,
+accessibile tramite browser web. I linguaggi, quindi, con cui verrà sviluppato
+il sistema sono HyperText Markup Language (HTML), Cascading Style Sheets (CSS) e
+JavaScript (JS). Il sistema di votazione sarà accessibile dalle sedi e sarà
+composto da una sezione dedicata alle offerte e pubblicità aziendali e una
+sezione per l'inserimento del voto in modo anonimo. La sezione dedicata agli
+amministratori, sarà distinto da quello di votazione , e finalizzato all'analisi
+e generazione dei grafici.
+\\\\
+Essendo il sistema ancora in fase di sviluppo e la soluzione che proporremo
+dovrà essere analizzata e valutata dal committente, il modello che
+useremo verrà cambiato ed acquisirà nuove proprietà. Per lo storage dei
+dati,dunque,avevamo il bisogno di usare un DBMS non relazionale, basato
+sui documenti e non vincolato a una struttura tabellare del modello
+rappresentato prefissata. L'utilizzo dei documenti per il salvataggio dei dati
+lascia maggiori libertà di modifica degli attributi del modello. Avendo
+deciso di sviluppare \emph{web application}, la scelta del database per lo
+storage dei dati è ricaduta su CouchDB. Questo database inoltre è interrogabile
+tramite richieste HTTP e permette la sincronizzazione automatica tra database
+ospitati su host diversi. In questo modo è possibile sincronizzare i dati
+presenti nei database delle filiali con la sede centrale.
+
