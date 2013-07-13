@@ -1,0 +1,98 @@
+\newpage
+\section{Promise Pattern}
+Per registrare il voto espresso dall'utente si effettua una richiesta POST al
+server dove è ospitato il dabatase. Le richieste vengono inoltrate con
+metodologia \ac{AJAX}. \ac{AJAX} permette di
+effettuare delle chiamate asincrone, cioè chiamate ad una risorsa
+esterna che non interferiscono con l'esecuzione della risorsa chiamante. I
+risultati della risorsa esterna saranno utilizzabili solo quando disponibili.
+Chiamate di tipo asincrono, quindi, permettono di effettuare altre operazioni
+senza alcun redirect o refresh della pagina.
+
+La richiesta HTTP viene composta dal metodo \$.ajax() prendendo in
+considerazione i parametri d'ingresso. Settando il metodo da chiamare, gli
+header necessari e il body, la richiesta viene composta e inviata al server.
+Utilizzare chiamate asicnrone, permette di strutturare il codice in nuovo modo:
+mentre le richieste \ac{AJAX} vengono eseguite è possibile realizzare delle
+callback che possono essere chiamate a seconda dello stato della chiamata
+utilizzando il promise pattern. 
+
+Una promessa è un oggetto che rappresenta il valore di ritorno o l'eccezione
+lanciata che una funzione può eventualmente fornire. Il promise pattern prevede
+tre differenti stati di una promessa :
+soddisfatta ( \emph{fulfilled} ) nel caso in cui la funzione ritorni un valore,
+non soddisfatta ( \emph{rejected} ) nel caso la funzioni generi un'eccezione e in
+corso ( \emph{progress}).
+Lo stato progess è uno stato temporaneo, mentre fulfilled e rejected sono
+definitivi. Una promessa può passare da uno stato progess a uno degli
+altri due, ma non viceversa. Il costrutto delle promesse permette quindi di
+realizare delle funzioni che vengono chiamate a seconda dello stato
+dell'oggetto. Le funzioni sono create all'interno del metodo
+then(~doneCallbacks [, failCallbacks] [, progressCallbacks ]~) riferito alla
+funzione iniziale.
+
+Con l'uso delle promesse la scrittura del codice viene semplificata ed agevola
+il controllo degli errori. Se pensiamo ad una serie di eventi da realizzare in
+catena, una funzione viene scritta all'interno dell'altra, e richiede
+particolare attenzione dal parte del programmatore per evitare gli errori. Ad
+esempio il codice:
+\\\\
+\begin{lstlisting}[language=JavaScript] 
+step1(function (value1) {
+    step2(value1, function(value2) {
+        step3(value2, function(value3) {
+            step4(value3, function(value4) {
+                // Do something with value4
+            });
+        });
+    });
+}); 
+\end{lstlisting}
+può essere semplificato con le promesse. Lo stato di una promessa viene
+propagato, quindi possiamo cogliere il fallimento di una di esse nel
+momento in cui fallisce, o alla fine della catena di promesse. In
+questo caso possiamo riscrivere il codice presentato prima con il seguente:
+\\\\
+\begin{lstlisting}[language=JavaScript] Q.fcall(step1) .then(step2)
+.then(step3)
+.then(step4)
+.then(function (value4) {
+    // Do something with value4
+}, function (error) {
+    // Handle any error from step1 through step4
+})
+.done();
+\end{lstlisting}
+L'utilizzo delle promesse facilita anche l'utilizzo di chiamate parallele. Il
+metodo \emph{all} riceve un array di promesse, ed appena tutte
+sono risolte si scatenano gli eventi della callback. In altri casi è possibile
+attendere che solo una di un array di promesse venga soddisfatta e si utilizza
+allora il metodo \emph{any}. Un'ulteriore alternativa consiste nell'attendere un
+numero precisato di promesse soddisfatte utilizzando la funzione \emph{some}.
+\\\\
+Di seguito il codice utilizzato nell'applicazione per inviare la votazione.
+Il metodo ajax() riceve come parametri d'ingresso l'URL del server,   
+il metodo \ac{HTTP} e l'oggetto da memorizzare nella base di dati. In questo
+caso la promessa, quando e se viene soddisfatta, lancia la funzione che restituisce un
+feddback all'utente della corretta esecuzione del processo di voto. 
+
+ \begin{lstlisting}[language=JavaScript] 
+$.ajax('http://' + server +':8888/' + agency, { 
+    type : "POST",
+    contentType : "application/json",
+    processData : false,
+    data : JSON.stringify({
+      "agency" : agency,
+      "operation" : operation,
+      "score" : $(this).data('score'),
+      "date" : new Date(),
+      "comment" : $('#comment').val(),
+      "customerName" : $('#customerName').val(),
+      "email" : $('#email').val()
+    })
+  }).then(function(response) {
+      $('#feedback').modal({
+        backdrop : 'static'
+      });
+    });
+\end{lstlisting}

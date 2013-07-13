@@ -1,0 +1,97 @@
+\newpage
+\section{Classi}
+L'applicazione sviluppata è aderente al pattern architetturale
+\ac{MVC}, paradigma che prevede la distinzione di tre diversi
+componenti del sistema:
+\begin{itemize}
+  \item \textbf{Model} : il modello è l'entità informativa del sistema e
+  fornisce i metodi per accedere ai dati utili all'applicazione. Nel nostro caso il
+  modello è composto dal voto del cliente, la data e la sede. I dati vengono
+  registrati su database CouchDB.
+  \item \textbf{View} : la vista presenta l'interfaccia grafica all'utente e ne
+  determina l'interazione col sistema, visualizza i dati contenuti nel model e
+  si occupa dell'interazione tra utenti e sistema. In questo caso è
+  stata sviluppata in linguaggio \ac{HTML} e \ac{CSS} e permette di selezionare
+  il livello di soddisfazione.
+  \item \textbf{Controller} : il controllore gestisce la comunicazione tra
+  l'interfaccia grafica e il database, in questo caso è stato sviluppato in
+  linguaggio \ac{JS}.
+\end{itemize}
+Il sistema di \ac{CS} proposto sarà composto da tre classi come descritto da
+~Figura~\ref{fig:classes}. Con \emph{voting} si intende il processo di votazione
+, con \emph{vote} il modello salvato su database.
+\begin{figure}[!h]
+  \centering
+  \begin{tikzpicture}
+    \begin{umlpackage}{Scorecard}
+      \umlclass[name=voting]{Voting : HTML}{
+          + molto soddisfatto : Button \\
+          + soddisfatto : Button \\
+          + mediamente soddisfatto : Button \\
+          + non del tutto soddisfatto : Button
+        }{
+        }
+      \umlclass[name=js,x=3,y=3]{Voting : JS}{
+        }{
+          + touch(event) : feedback \\
+          + post(json) : response
+        }
+      \umlclass[name=vote,x=6]{Vote : JSON}{
+          + agency : int \\
+          + vote : int \\
+          + date : Date
+        }{
+        }
+      \umlassoc{voting}{js}
+      \umlassoc{js}{vote}
+    \end{umlpackage}
+  \end{tikzpicture}
+  \caption{Classi del sistema di~\emph{CS}}
+  \label{fig:classes}
+\end{figure}
+\\\\L'utente agisce sulla vista del programma attivando una delle sue componenti
+di controllo, nel nostro caso i \emph{bottoni} che permettono di registrare la
+votazione. Il controllore che è in ascolto dell'evento, riceve l'input di
+votazione ed esamina la vista per rilevarne le informazioni aggiuntive, come
+l'associazione tra pulsante premuto e valore assegnato. Il controllore invia
+tali informazioni al modello che effettua lo storage dei dati ed
+attende la risposta per aggiornare il proprio stato. Successivamente richiede
+alla vista di visualizzare il risultato della computazione. La vista, infine,
+farà ritornare all'utente il risultato dell'operazione eseguita.
+L'implementazione del \emph{controllore} in ascolto sull'evento votazione è
+riportato in figura~~\ref{fig:votingcontroller}, la sequenza del controllore
+del monitoraggio voti è riportato in figura~~\ref{fig:monitoringcontroller}.
+
+\begin{figure}[!h]
+  \centering
+  \begin{tikzpicture}
+    \begin{umlseqdiag}
+      \umlactor[class=User]{Customer}
+      \umlcontrol[class=Controller]{Scorecard}
+      \umldatabase[class=Datasource]{CouchDB}
+      \begin{umlcall}[op=touch(event),return=feedback]{Customer}{Scorecard}
+        \begin{umlcall}[op=post(json),return=response]{Scorecard}{CouchDB}
+        \end{umlcall}
+      \end{umlcall}
+    \end{umlseqdiag}
+  \end{tikzpicture}
+  \caption{Sequenza di espressione voto}
+  \label{fig:votingcontroller}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tikzpicture}
+    \begin{umlseqdiag}
+      \umlactor[class=User]{Administrator}
+      \umlcontrol[class=Controller]{Scorecard}
+      \umldatabase[class=Datasource]{CouchDB}
+      \begin{umlcall}[op=browse(),return=graph]{Administrator}{Scorecard}
+        \begin{umlcall}[op=get(),return=response]{Scorecard}{CouchDB}
+        \end{umlcall}
+      \end{umlcall}
+    \end{umlseqdiag}
+  \end{tikzpicture}
+  \caption{Sequenza di monitoraggio voti}
+  \label{fig:monitoringcontroller}
+\end{figure}

@@ -1,26 +1,27 @@
 \newpage
 \section{Casi d'uso}
+Nell'applicazione qui presentata ci sono due casi d'uso: uno riservato agli
+utenti~(Figura~\ref{fig:usecase-voting}), l'altro agli
+amministratori~(Figura~\ref{fig::usecase-monitoring}).
 \subsection{Inserimento della votazione \emph{front end}}
 \begin{itemize}
-  \item \textbf{Voto in uscita} : In uscita dalla segreteria lo studente
+  \item \textbf{Voto in uscita} : in uscita dalla sede il cliente
   troverà un totem multimediale touch screen con cui potrà esprimere il
   proprio livello di soddisfazione dopo aver usufruito dei servizi offerti. La
-  schermata di introduzione è composta da un messaggio inserito per spiegare
+  schermata di introduzione è composta da un messaggio che spiega
   all'utilizzatore la finalità per la quale viene richiesto di lasciare un
-  \emph{feedback}, un video introduttivo dell'Università degli Studi di Padova
-  e la scelta dell'operazione effettuata : servizio ricevuto presso lo sportello
-  di facoltà o sportello veloce.
-  \item \textbf{Inserimento commento} : Lo studente può lasciare un proprio
-  commento selezionando l'area con la voce ``Laciaci un commento''. Comparirà
+  \emph{feedback}, un video introduttivo realizzato dell'azienda a scopi
+  commerciali e la scelta dell'operazione effettuata: servizio ricevuto presso
+  lo sportello oppure una consulenza sulle operazioni finanziarie.
+  \item \textbf{Inserimento commento} : l'utente può lasciare un proprio
+  commento selezionando l'area con la voce ``Lasciaci un commento''. Comparirà
   una finestra di dialogo che permetterà l'inserimento del testo , il nome e
-  cognome e l'indirizzo email se il cliente vuole essere contattato. Per
-  registrare il commento bisogna accettare le condizioni sulla
+  cognome e l'indirizzo email nel caso in cui il cliente abbia piacere di essere
+  contattato.
+  Per registrare il commento bisogna accettare le condizioni sulla
   privacy.
-  \item \textbf{Registrazione del voto} : Il cliente esprime il proprio livello
-  di soddisfazione tramite l’interfaccia selezionando uno dei 3 bottoni. In caso
-  l'utente avesse selezionato nella schermata precedente la voce ``servizio
-  sportello di facoltà'' un menu a tendina comparirà per indicare lo sportello
-  difacoltà al quale si è rivolto~(Figura~\ref{fig:usecase-voting}).
+  \item \textbf{Registrazione del voto} : il cliente esprime il proprio livello
+  di soddisfazione tramite l’interfaccia selezionando uno dei 4 bottoni.
   \item \textbf{Feedback all'utente} : Terminato il processo di registrazione
   una finestra di dialogo certifica all'utente che il processo di voto si è
   concluso in modo corretto.
@@ -48,18 +49,18 @@
 \end{figure}
 
 \subsection{Consultazione dei voti \emph{back end}}
-L'amministratore potrà consultare l'andamento del livello di Customer
-Satisfaction via browser web. L’interfaccia di riepilogo dei
-voti presenterà in modo graﬁco i dati raccolti
+L'amministratore potrà consultare l'andamento del livello di \acf{CS} via
+browser web.
+L’interfaccia di riepilogo dei voti presenterà in modo graﬁco i dati raccolti:
 \begin{itemize}
-  \item L'amministratore accede all'interfaccia web del sistema.
-  \item L'amministratore sceglie la/e facoltà da monitorare, l'intervallo di
+  \item l'amministratore accede all'interfaccia web del sistema.
+  \item l'amministratore sceglie la/e sedi da monitorare, l'intervallo di
   tempo e la tipologia di grafico. Il grafico generato conterrà in ascissa
-  l'intervallo di tempo scelto e in ordinata il valore del CS. A seconda
+  l'intervallo di tempo scelto ed in ordinata il valore del \ac{CS}. A seconda
   del periodo da monitare l'intevallo di campionamento è espresso in ore per la
   modalità ``giornaliera'', giorni per ``mensile'' e mesi per
-  ``annuale''~(Figura~\ref{fig::usecase-monitoring}).
-  \item La selezione del valore ``automatico'' aggiornerà il grafico ogni 5
+  ``annuale''.
+  \item la selezione del valore ``automatico'' aggiornerà il grafico ogni 5
   secondi aggiornando i valori qual'ora venisse registrata una nuova votazione.
 \end{itemize}
 

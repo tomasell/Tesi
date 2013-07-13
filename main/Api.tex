@@ -1,0 +1,148 @@
+\newpage
+\subsection{API}
+Il database è accessibile tramite richieste \acf{HTTP}, le cui proprietà sono
+specificate nella \ac{RFC} 2616. Una richiesta
+\ac{HTTP} è formata da una riga di richiesta (\emph{request line}) che contiene
+il metodo, lo \ac{URI} e la versione del protocollo. La seconda componente della
+richiesta è la sezione \emph{header} , la terza il \emph{body}. 
+
+Attraverso i metodi messi a disposizione dal protollo,
+è possibile memorizzare nuovi dati e creare nuove viste (\emph{Create}),
+richiedere informazioni (\emph{Read}), modificare le informazioni memorizzate
+all'interno dei documenti (\emph{Update}) ed eliminare documenti
+(\emph{Delete}).
+
+Ogni documento è raggiungibile da uno \ac{URL} univoco. Il protocollo \ac{HTTP}
+prevede la seguente sintassi per definire l'~\ac{URL} di una risorsa alloccata : 
+
+http\_URL = ``http:'' ``//'' host [ ``:'' port ] [ abs\_path [ ``?'' query
+]]
+\\
+\emph{Host} è l'indirizzo del server sul quale è ospitato il database,
+\emph{port} indica la porta sulla quale è in ascolto CouchDB, che di default è
+la 5984 per richieste http, 6984 per ssl, modificabili accedendo al file di
+configurazione. Se si vuole accedere al database \emph{abs\_path} è il nome del
+database stesso, se si vuole accedere ad una vista il percorso da inserire sarà
+composto da
+
+nome\_database ``/\_design/'' nome\_design\_document ``/\_view/'' nome\_vista.
+\\\\
+Le operazioni \ac{CRUD}  sulle risorse sono
+eseguibili tramite i seguenti metodi \ac{HTTP} ( gli esempi riportati sono stati
+realizzati con il command line tool \textit{cURL}):
+\begin{itemize}
+  \item \textbf{GET} : richiede l'elemento specificato. Il formato dell'\ac{URL}
+  definisce ciò che viene restituito: CouchDB può restituire elementi
+  statici (ad esmepio viste), documenti di database e di configurazione.
+  L'informazione viene restituita sotto forma di un documento \ac{JSON}.
+  Per ottenere documenti non l'URL deve essere composto da :
+  
+  ``http://'' host ``:'' port ``/'' database ``/'' \_id
+  
+  es: \emph{curl -X GET ``http://atcustomersat:5984/padova/55090\ldots''}.
+  
+  Per ottenere elementi statici come le viste l'URL deve essere composto da:
+  
+  ``http://'' host ``:'' port  ``/'' database ``/\_design/''\_id 
+  
+  es: \emph{curl -X GET
+  ``http://atcustomersat:5984/padova/\_design/consulting''}.
+  
+  \item \textbf{HEAD} : questo metodo viene utilizzato per ottenere
+  l'intestazione \ac{HTTP} di una richiesta GET senza il corpo della risposta.
+  Viene utilizzato per verificare l'esistenza di un oggetto senza richiederne il
+  contenuto. In caso di documenti di grandi dimensioni, verificarne l'esistenza
+  con il metodo HEAD velocizza notevolmente l'applicazione, in quanto non si
+  deve aspettare che ritorni l'oggetto richiesto. L'\ac{URL} per accedere ai
+  documenti ha la stessa sintassi di una richiesta GET.
+   
+  es: \emph{curl -X HEAD ``http://atcustomersat:5984/padova/55090\ldots''}
+  \item \textbf{POST} : permette di inviare nuovi documenti al database di
+  destinazione. In questo caso la richiesta POST deve avere come
+  contenuto del body un documento \ac{JSON} valido.
+  
+  Per inviare un documento l'URL deve essere composto da:
+  
+  ``http://'' host ``:'' port ``/'' database 
+  
+  es : \emph{curl -X POST ``http://atcustomersat:5984/padova'' -H
+  ``Content-Type:}
+  \emph{application/json'' --data @scorecard.json}
+  
+  Dove \emph{scorecard.json} è un file contentente un documento json. 
+  \item \textbf{PUT} : permette di inviare una risorsa specificata. In
+  CouchDB il metodo PUT può essere utilizzato per creare nuovi dodumenti e
+  database.
+  
+  es : \emph{curl -X PUT ``http://atcustomersat:5984/padova/123456798''}
+  \emph{ -H ``Content-Type:application/json'' --data @scorecard.json}
+  \item \textbf{DELETE} : cancella la risorsa specificata.
+  
+  es: \emph{curl -X DELETE ``http://atcustomersat:5984/padova/55090\ldots''}
+\end{itemize}
+Per aderire alle specifiche HTTP, è necessario, inoltre, che gli headers
+siano settati e vengano forniti in modo da ottenere il formato e codifica
+corretta. Gli headers essenziali sono \emph{Content~-~type} e \emph{Accept}.
+\textbf{Content~-~type} specifica il tipo di contenuto dei dati che
+vengono forniti nella richiesta. CouchDB accetta il formato JSON quindi l'header
+sarà \emph{application/json}.
+L'header \textbf{Accept}, invece, indica quali tipi di file sono accettati dal
+client, in formato MIME (es: text/html). Solitamente sarà settato con
+\emph{application/json}, \emph{*/*} se sono supportati tutti i tipi di file.
+\\\\
+Per realizzare interrogazioni parametrizzate, si usano le query-string. La
+query-string è la parte di un URL che contiene dei dati da passare in input ad
+un programma. Il carattere ``?'' apre la query-string, è utilizzato come
+carattere speciale e non viene incluso nella query. Ogni argomento è formato da
+una coppia chiave - valore. Alla chiave X si assegna il valore Y con il segno
+``='' ed ogni argomento è separato da un altro con il carattere ``\&''. 
+La sinstassi per realizzare una query string è, dunque, la seguente :
+
+  
+``?parametro1=valore1\&parametro2=valore2\&parametro3=valore3''.
+\\\\
+Le query parametrizzate vengono utilizzate nell'applicazione nel momento della
+generazione dei grafici. C'è la possibilità di scegliere la sede che si vuole
+monitorare, il tipo di servizio, l'intervallo temporale e il tipo di grafico.
+Ogni voce scelta andrà a settare un parametro nell'\ac{URL}. I parametri
+permessi da CouchDB sono illustrati nella tabella seguente.
+\\\\
+\begin{tabular}{|>{\columncolor{background}}p{2.4cm}|p{3.1cm}|p{1.4cm}|p{5.8cm}|}
+  \hline
+  \rowcolor{table}
+  \textbf{Parametro} & 
+  \textbf{Valore} & 
+  \textbf{Default} &
+  \textbf{Descrizione}
+   
+  \\\hline key & JSON & - & Indica la coppia chiave-valore, deve rispettare
+  la sintassi dell'URL.
+  \\\hline startkey & JSON
+    & - & Indica il valore della chiave di partenza, deve rispettare la
+    sintassi dell'URL.
+  \\\hline startkey\_docid & ``\_id'' del documento & - & ID del documento di
+  partenza.
+  \\\hline endkey & JSON
+    & - & Indica il valore massimo della chiave, deve rispettare la
+    sintassi dell'URL.
+  \\\hline endkey\_docid & ``\_id'' del documento & - & ID del documento che
+    termina la ricerca.
+  \\\hline limit & intero & - & Limita il numero di documenti
+    restituiri.
+  \\\hline descending & true/false & false & Ordinamento della ricerca.
+  \\\hline skip & intero & 0 & Salta il numero indicato di documenti.
+  \\\hline group & true/false & false & Controlla se la funzione di
+    \emph{reduce} viene applicata a un gruppo di chiavi distinte o singola riga di
+    risultati.
+  \\\hline group\_level & intero & - & Indica il livello di raggruppamento da
+  applicare alla funzione \emph{reduce}.
+  \\\hline reduce & trey/false & true & Specifica se utilizzare la funzione
+  \emph{reduce}.
+  \\\hline
+\end{tabular}
+\\\\
+Ad esempio per ricevere i dati di una particolare sede, ragguppati per mesi e
+per il periodo temporale compreso tra gennaio e luglio 2013, la query è la
+seguente
+
+?group\_level=2\&startkey=[2013,1,1,1]\&endkey=[2013,7,31,23]

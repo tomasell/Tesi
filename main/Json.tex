@@ -1,20 +1,20 @@
 \newpage
 \subsection{JSON}
-I DBMS orientati ai documenti non memorizzano i dati in struttura tabelle con
-campi prefissati per ogni record come nei database relazionali, ma ogni valore è
+I \ac{DBMS} orientati ai documenti non memorizzano i dati in struttura tabelle
+con campi prefissati per ogni record come nei database relazionali, ma ogni valore è
 memorizzato come un documento con determinate caratteristiche. Qualsiasi numero
 di campi e qualsiasi tipologia di dato rappresentato può essere aggiunto al
 documento.
-\\\emph{JavaScript Object Notation}) è un formato basato sul linguaggio
+\\\acf{JSON} è un formato basato sul linguaggio
 \emph{Javascript} utilizzato per lo scambio d'infomazioni in applicazioni
 client-server e utilizzato come formato da alcuni DBMS orientati ai documenti,
-quali CouchDB o MongoDB.
-Attraverso la notazione JSON è possibile rappresentare qualsiasi proprietà di un
-oggetto, con il vantaggio che la struttura del documento non è vincolata ad un
+quali \ac{CouchDB} o MongoDB.
+Attraverso la notazione \ac{JSON} è possibile rappresentare qualsiasi proprietà
+di un oggetto, con il vantaggio che la struttura del documento non è vincolata ad un
 modello prefissato, ma può variare nel tempo. Infatti è possibile aggiungere e
 rimuovere proprietà dell'oggetto o addirittura modificarne il tipo di dato
 rappresentato ed è possibile inserire attributi multipli o oggetti.
-\\\\Un documento JSON è formato da due strutture:
+\\\\Un documento \acl{JSON} è formato da due strutture:
 \begin{itemize}
   \item Una collezione di coppie ``nome''/``valore'' ;
   \item Un elenco ordinato di valori. 
@@ -67,7 +67,8 @@ votazione,\emph{date} , viene raccolta dal sistema e salvata nel formato
 { 
    _id:"182b00cd54a2b054fffabf1042000fbb", 
    _rev:"1-cb887f197900dce789c2dca898e4d330", 
-   department: "engineering",
+   agency: "vicenza",
+   operation: "counter",
    score: 5,
    date: "2013-06-01T11:40:52.280Z",
    comment: "Servizio efficiente",

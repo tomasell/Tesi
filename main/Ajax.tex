@@ -1,0 +1,26 @@
+\\\\
+Per registrare il voto espresso dall'utente si effettua una richiesta POST al
+server dove è ospitato il dabatase. Le richieste vengono inoltrate con
+metodologia AJAX (Asynchronous JavaScript and XML). AJAX permette di
+effettuare delle chiamate asincrone, cioè chiamate ad una risorsa
+esterna è che non interferiscono con l'esecuzione della risorsa chiamante. I
+risultati della risorsa esterna saranno utilizzabili solo quando disponibili.
+Chiamate di tipo asincrono, quindi, permettono di effettuare altre operazioni
+senza alcun redirect o refresh della pagina.
+
+\begin{lstlisting}[language=JavaScript] 
+$.ajax('http://' + server +':8888/' + agency, { 
+    type : "POST",
+    contentType : "application/json",
+    processData : false,
+    data : JSON.stringify({
+      "agency" : agency,
+      "operation" : operation,
+      "score" : $(this).data('score'),
+      "date" : new Date(),
+      "comment" : $('#comment').val(),
+      "customerName" : $('#customerName').val(),
+      "email" : $('#email').val()
+    })
+  });
+\end{lstlisting}

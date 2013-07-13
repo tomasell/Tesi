@@ -1,3 +1,199 @@
 \newpage
 \subsection{Map-Reduce}
-INTRO\\MAP REDUCE USATE
+\emph{MapReduce} è un framework software per scrivere facilmente applicazioni
+che elaborano grandi quantità di dati in parallelo. Il sistema è formato da due
+funzioni~: \emph{map} e \emph{reduce}. La prima elabora le coppie chiave-valore
+, la seconda elabora il set di coppie generate dalla funzione \emph{map} 
+restituendo l'output richiesto.
+\begin{itemize}
+  \item \emph{map}: il nodo master prende i dati di ingresso (fase
+  \emph{input}), li suddivide in piccoli blocchifase
+  \emph{splitting}, generalmente da 64MB o 128MB e distribuisce il lavoro ai
+  nodi slaves. Il singolo nodo \emph{mapper} produce il risultato intermedio della
+  funzione di map() sotto forma di coppie [chiave,valore] memorizzate su un file
+  distribuito, la cui locazione è notificata al master alla fine della fase di
+  map (fase \emph{mapping}).
+  \item \emph{reduce}: il nodo master colleziona le risposte, combina le coppie
+  [chiave,valore] in liste di valori che condividono la stessa chiave e li
+  ordina per chiave (fase
+  \emph{shuffling}). Le coppie della forma,
+  [chiave,IteratorList(valore,\ldots)] sono passate ai nodi reducer che
+  eseguono la funzione di reduce() (fase
+  \emph{reducing}).
+\end{itemize}
+Le funzioni di \emph{map} e \emph{reduce} sono implementate in Javascript, e
+CouchDB mette a disposizione ulteriori funzioni native da utilizzare.
+La funzione \emph{reduce} come parametri di input ha una collection di chiavi,
+una collection di valori e un valore booleano \emph{rereduce}. Se settato a
+true, rereduce permette di usare la funzione reduce al blocco di risultati
+generato dalle chiamate della funzione. Per database di grandi dimensioni,
+CouchDB chiama le funzioni per blocchi di dati in modo da velocizzare l'analisi
+dei dati. Non applicando la funzione rereduce c'è il rischio di ottenere un
+output sbagliato.
+
+ Ad esempio ipotizziamo di avere un set di documenti
+composto da 1000 chiavi.
+La fase di map calcola ``chiave''=``valore'' e il motore di CouchDB divide i
+documenti ricevuti come input in 3 blocchi. Nella fase di reduce, la funzione
+calcola quanti elementi sono presenti nel db. La situazione di partenza prevede
+1000 oggetti, la fase di map e reduce divide in 3 blocchi contenenti
+rispettivamente 333,333 e 334 oggetti.
+L'output resituito dalla funzione reduce è errato, in quanto calcola il numero
+di oggetti presenti restituito dopo le operazioni, calcola quindi 3
+oggetti(~Figura~\ref{fig:reduce}).
+Applicando la funzione di rereduce, invece, viene calcolata la somma dei valori
+restituiti dai 3 oggetti temporanei, restituendo l'output
+corretto(~Figura~\ref{fig:rereduce}).
+
+
+\begin{figure}[!h]
+\begin{tikzpicture}[%
+  >=triangle 60,              % Nice arrows; your taste may be different
+  start chain=going below,    % General flow is top-to-bottom
+  node distance=6mm and 60mm, % Global setup of box spacing
+  every join/.style={norm},   % Default linetype for connecting boxes
+  ]
+\tikzset{
+  base/.style={draw, on chain, on grid, align=center, minimum height=4ex},
+  proc/.style={base, rectangle, text width=10em},
+  map/.style={base, rectangle, text width=10em},
+  cong/.style={->, draw, lccong}, 
+  it/.style={font={\small\itshape}}
+}
+\node
+[proc,xshift=12em](input){\textbf{key}~,~\textbf{val}\\1~,~1\\\ldots~,\ldots\\1000~,~5984};
+\node [proc,xshift=-12em](split1){\textbf{key}~,~\textbf{val}\\1~,~1\\\ldots~,
+\ldots\\333,210};
+\node [map,fill=background](map1){function(key,val)~\{\\ count(val);\}};
+\node [proc](result1){\textbf{key} , \textbf{val}\\ null~,~333};
+\node [proc,xshift=12em,yshift=15.19em](split2){\textbf{key}
+,\textbf{val}\\334~, 458\\\ldots~,~\ldots\\666,131}; 
+\node [map,fill=background](map2){function(key,val)~\{\\ count(val);\}}; 
+\node [proc](result2){\textbf{key} , \textbf{val}\\ null~,~333}; 
+\node [proc,xshift=12em,yshift=15.19em](split3){\textbf{key}
+,\textbf{val}\\667~,~125\\\ldots~,\ldots\\1000,5984}; 
+\node [map,fill=background](map3){function(key,val)~\{\\ count(val);\}}; 
+\node [proc](result3){\textbf{key} ,\textbf{val}\\ null~,~334};
+\node [map,fill=background,xshift=-12em](reduce){function(key,val)~\{\\ count(val);\}};
+\node [proc](output){\textbf{key} , \textbf{val}\\null~,~3};
+
+\path (input.south) to node [near start, xshift=5em] {}
+(split1); \draw [->] (input.south) -- (split1.north);
+\path (input.south) to node [near start, xshift=5em] {}
+(split2); \draw [->] (input.south) -- (split2.north);
+\path (input.south) to node [near start, xshift=5em] {}
+(split3); \draw [->] (input.south) -- (split3.north);
+
+\path (split1.south) to node [near start, xshift=5em] {}
+(map1); \draw [->] (split1.south) -- (map1.north);
+\path (split2.south) to node [near start, xshift=5em] {}
+(map2); \draw [->] (split2.south) -- (map2.north);
+\path (split3.south) to node [near start, xshift=5em] {}
+(map3); \draw [->] (split3.south) -- (map3.north);
+
+\path (map1.south) to node [near start, xshift=5em] {}
+(result1); \draw [->] (map1.south) -- (result1.north);
+\path (map2.south) to node [near start, xshift=5em] {}
+(result2); \draw [->] (map2.south) -- (result2.north);
+\path (map3.south) to node [near start, xshift=5em] {}
+(result3); \draw [->] (map3.south) -- (result3.north);
+
+\path (result1.south) to node [near start, xshift=5em] {}
+(reduce); \draw [->] (result1.south) -- (reduce.north);
+\path (result2.south) to node [near start, xshift=5em] {}
+(reduce); \draw [->] (result2.south) -- (reduce.north);
+\path (result3.south) to node [near start, xshift=5em] {}
+(reduce); \draw [->] (result3.south) -- (reduce.north);
+
+\path (reduce.south) to node [near start, xshift=5em] {}
+(output); \draw [->] (reduce.south) -- (output.north);
+
+\end{tikzpicture} 
+\caption{MapReduce con \emph{rereduce=false}}\label{fig:reduce}
+\end{figure}
+
+\def\HS{\hspace{\fontdimen2\font}}
+
+\begin{figure}[!h]
+\begin{tikzpicture}[%
+    >=triangle 60,              % Nice arrows; your taste may be different
+    start chain=going below,    % General flow is top-to-bottom
+    node distance=6mm and 60mm, % Global setup of box spacing
+    every join/.style={norm},   % Default linetype for connecting boxes
+    ]
+\tikzset{
+  base/.style={draw, on chain, on grid, align=center, minimum height=4ex},
+  empty/.style={ on chain, on grid, align=center, minimum height=6ex,text
+  width=10em},
+  proc/.style={base, rectangle, text width=10em, align=center},
+  map/.style={base, rectangle, text width=10em,align=left},
+  cong/.style={->, draw, lccong}, 
+  it/.style={font={\small\itshape}}
+}
+\node [empty, densely dotted, it] (empty1) { };
+\node [proc, densely dotted, it,xshift=12em] (p0) { splitting \space  \&
+\space mapping }; \node [map,fill=background](reduce){function(key,val)~\{\\
+if (rereduce)\\ \{\space\space\space sum(val) \} \\ else\\
+\{\space\space\space count(val) \};\}}; \node [proc](output){\textbf{key} ,
+\textbf{val}\\null~,~1000};
+
+\path (p0.south) to node [near start, xshift=5em] {}
+(reduce); \draw [->] (p0.south) -- (reduce.north);
+
+\path (reduce.south) to node [near start, xshift=5em] {}
+(output); \draw [->] (reduce.south) -- (output.north);
+
+\end{tikzpicture} 
+\caption{MapReduce con \emph{rereduce=true}}\label{fig:rereduce}
+\end{figure}
+
+
+
+\newpage \newpage
+Di seguito è presentata la funzione map utilizzata nel calcolo della somma dei
+voti per l'operazione di consulenza. Nel momento della fase di map, vengono scartati
+i documenti che non appartengono al gruppo scelto. Successivamente viene creata
+la coppia chiave-valore da inviare alla funzione di reduce. La chiave è la data
+trasformata in un array, per agevolare il raggruppamento in fase di output.
+
+\begin{lstlisting}[language=JavaScript] 
+function(doc) {
+  if (doc.operation != 'consulting') 
+    return;
+  var date = new Date(doc.date);
+  emit(
+    [date.getFullYear(), 
+     (date.getMonth()  +1),
+     date.getDate(),
+     date.getHours()],
+    doc.score); 
+}
+\end{lstlisting}
+La funzione reduce raccoglie i dati, distinguendo i casi in cui rereduce è
+settato a true oppure a false.
+ \begin{lstlisting}[language=JavaScript]
+function (key, values, rereduce) {
+  // Reduce function
+  var count = 0;
+  var sum = 0;
+  var i;
+
+  if(!rereduce) {
+    // `values` stores actual map output
+    for(i = 0; i < values.length; i++) {
+      count += 1;
+      sum += Number(values[i]);
+    }
+    return {"count":count, "sum":sum};
+  }
+
+  else {
+    // `values` stores count/sum objects returned previously.
+    for(i = 0; i < values.length; i++) {
+      count += values[i].count;
+      sum   += values[i].sum;
+    }
+    return {"count":count, "sum":sum};
+  }
+}
+\end{lstlisting}

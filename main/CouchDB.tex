@@ -1,5 +1,80 @@
 \newpage
 \section{CouchDB}
+Apache \ac{CouchDB} è \ac{DBMS} 
+non relazionale ottimizzato per essere utilizzato in applicazioni web. È un
+database opensource, nato nel 2005 e mira a diventare il database di Internet.
+
+\ac{CouchDB}, essendo un database \ac{NoSQL}, memorizza i dati come documenti
+utilizzando il formato \ac{JSON}.
+Ogni database è una collezione di documenti ed ogni documento contiene i propri
+dati e schema in modo indipendente dagli altri. Il documento memorizzato in una
+base di dati contiene tutte le proprietà dell'oggetto che si vuole rappresentare
+e, inoltre, memorizza i metadata associati ad esso :
+\emph{``\_id"} e \emph{``\_rev"}. La variabile \emph{``\_id"} rappresenta l'id univoco
+per ogni documento e, se non viene istanziata dall'utente, assume un valore assegnato
+dal motore di CouchDB.
+La propretà \emph{``\_rev"} viene utilizzata per la gestione delle revisioni.
+\ac{CouchDB} è in grado di gestire la contemporaneità di accesso ad una risorsa
+fra un elevato numero accessi in lettura e scrittura della risorsa stessa. Questo
+sistema è implementato tramite \ac{MCC}.
+
+Proviamo ad immaginare il caso in cui un utente prova a leggere una risorsa e
+nello stesso istante un secondo utente la sta usando e modificando. Se questo
+passaggio critico non viene gestito in modo corretto, è possibile che il lettore
+veda la risorsa in modo inconsistente, in uno stato non completo e con una
+perdita parziale o totale dei dati. Questo tipo di situazione può, inoltre,
+creare stalli ed errori nell'applicazione che accede alla risorsa.
+Una soluzione per evitare ciò, è quella di bloccare la risorsa appena un utente
+prova accedere per modificarla. Limitare la risorsa ad un accesso contemporaneo
+non sempre è accettabile, in quanto blocca tutte operazioni di lettura e
+scrittura, rendendo inaccessibile la risorsa.
+
+\ac{MCC} propone un approccio differente : ogni utente che accede alla risorsa,
+ne visualizza il suo ultimo stato consistente, cioè uno stato in cui tutti ivincoli
+definiti dalla risorsa sono rispettati. In questo modo le modifiche effettuate
+da un utente non saranno visibili fino a che non viene completata l'operazione
+di scrittura. Tutti gli utenti, però, potranno accedere contemporaneamente alla
+risorsa. Per permettere ciò, ad ogni modifica non viene aggiornato direttamente
+il documento restituito dalla richiesta, ma lo si segna come obsoleto e se ne
+crea uno nuovo aggiornato, al quale verrà assegnato un nuovo valore della
+versione. La chiave \emph{``\_rev''} viene, dunque, aggiornata e questo
+meccanismo è alla base della prevenzione dei conflitti in fase di salvataggio.
+In questo modo ci sono più versioni dell'oggetto, ma solo una di esse è l'ultima
+versione. Per evitare sovraccarichi di documenti obsoleti è necessario che il
+sistema periodicamente faccia pulizia e cancelli i dati più vecchi. CouchDB
+predispone di un sistema di \emph{merging} dei documenti per non perdere le
+modifiche fatte da diversi utenti alla stessa risorsa.
+\\\\
+\ac{CouchDB} fornisce la semantica \ac{ACID} per tutte le transazioni. Una transazione è una sequenza
+di operazioni che può concludersi con un successo o un fallimento. In caso di
+successo il risultato delle operazioni deve essere permanente, mentre in caso
+di insuccesso si deve tornare allo stato della risorsa che aveva al
+momento dell'inizio della transazione. Aderire alla semantica \ac{ACID},
+permette di avere un sistema stabile e che mantiene il corretto funzionamento,
+anche a fronte di errori esterni, come ad esempio un mancanza della connessione
+durante l'invio dei dati, o crash del sistema.
+Di seguito l'analisi delle proprietà \acf{ACID}~:
+\begin{itemize}
+  \item \textbf{Atomicity}: la transazione è indivisibile nella sua esecuzione e
+  la sua esecuzione deve essere o totale o nulla, non sono ammesse esecuzioni
+  parziali. In caso di fallimento dell'operazione si ritorna allo stato
+  precedente;
+  \item \textbf{Consistency}: la transazione porta l'oggetto sul quale si opera
+  da uno stato consistente iniziale ad un secondo stato consistente finale.
+  La transazione non deve violare eventuali vincoli di integrità, quindi non 
+  devono verificarsi contraddizioni tra i dati archiviati nel database;
+  \item \textbf{Isolation}: ogni transazione deve essere eseguita in modo
+  isolato e indipendente dalle altre transazioni. L'eventuale fallimento di una
+  transazione non deve interferire con le altre transazioni in esecuzione;  
+  \item \textbf{Durability}: detta anche persistenza, garantisce che una
+  transazione eseguita rimarrà valida anche in caso di errori successivi. I
+  cambiamenti apportati non dovranno essere persi per crush o errori nel
+  sistema. Per evitare che nel lasso di tempo fra il momento in cui la base di
+  dati si prepara a scrivere le modifiche e quello in cui li scrive
+  effettivamente si verifichino perdite di dati dovuti a malfunzionamenti, le
+  operazioni eseguite verranno registrate su file di log.
+\end{itemize}
+
 \input{Json.tex}
 \input{Api.tex}
 \input{Replication.tex}

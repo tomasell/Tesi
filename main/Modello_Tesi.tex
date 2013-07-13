@@ -7,7 +7,8 @@
 \usepackage{xcolor}
 
 \colorlet{punct}{red!60!black}
-\definecolor{background}{HTML}{EEEEEE}
+\definecolor{background}{HTML}{FFFCEE}
+\definecolor{table}{HTML}{CCCCCC}
 \definecolor{delim}{RGB}{20,105,176}
 \colorlet{numb}{green!60!black}
 
@@ -42,3 +43,25 @@
       {[}{{{\color{delim}{[}}}}{1}
       {]}{{{\color{delim}{]}}}}{1}
 }
+\lstset{numbers=left, numberstyle=\scriptsize, stepnumber=1, numbersep=5pt,
+    xleftmargin=3.0ex}
+\lstdefinelanguage{JavaScript}{
+  backgroundcolor=\color{background},
+  frame=lines,
+  basicstyle=\ttfamily\footnotesize,
+  keywords={typeof, new, true, false, catch, function, return, null, catch,%
+  switch, default, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries, ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+} 
+
+
+

@@ -1,0 +1,43 @@
+\newpage
+\subsection{Replication} 
+CouchDB consente si sincronizzare database situati su differenti host
+permettendo quindi agli utenti di accedere a risorse situate su host diversi in
+modo trasparente.
+La sincronizzazione è possibile perchè CouchDB è un database
+NOSQL e quindi ogni base di dati è una collezione di documenti indipendenti tra
+di loro, cioè che documenti diversi possono rappresentare oggetti
+diversi.
+La sincronizzazione è unilaterale, bisogna indicare un server che conterrà
+il database originale (\emph{source}) e uno con funzione di \emph{target}.
+Un database viene definito ``locale'' quando si trova sulla stessa istanza del
+server al quale viene inviata la richiesta di replication.
+Tutti gli altri casi i database sono definiti ``remoti''.
+Per sincronizzare un database si effettua una richiesta POST, inviando nel body
+un documento JSON contenente i database di source e destination:
+
+\begin{lstlisting}[language=json]
+//file replication.json:
+{
+  source:"database",
+  target:"http://example.org/database"
+}
+\end{lstlisting}
+ 
+ 
+\emph{curl -X POST http://atcustomersat:5984/\_replicate -H ``Content-Type:}
+\emph{application/json'' --data @replication.json}
+\\\\
+Quando si utilizza la sincronizzazione, CouchDB confronta i due database e
+verifica quali documenti presenti nel source differiscono da quelli presenti nel
+target. I documenti alloccati nel target verranno modificati , cancellati o
+creati a seconda dello stato di quelli presenti nell'origine. Il numero di
+revisione del documento viene modificato, ed è possibile risalire alle modifiche
+effettuate al momento della sincronizzazione. Per realizzare una
+sincronizzazione bilaterale basta inviare due richieste di replication
+invertendo target e source.
+
+Aggiungendo il parametro continuous e settandolo a true, è possibile continuare
+a sincronizzare i database ogni volta che vengono aggiunti o modificati
+documenti nel database di source. Nell'attuale versione di CouchDB ( v1.3.0) non
+è possibile continuare la sincronizzazione dopo il riavvio del server, in quanto
+i settaggi della replication vengono resettati.
